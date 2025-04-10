@@ -478,6 +478,29 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        /* Mobile Blocker Styles */
+        .mobile-blocker {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        .mobile-blocker p {
+            max-width: 300px;
+        }
+        /* End Mobile Blocker Styles */
     </style>
     <!-- QR Code Generator -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
@@ -485,6 +508,12 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
+    <!-- Mobile Blocker -->
+    <div id="mobile-blocker" class="mobile-blocker">
+        <p>此頁面功能較複雜，請使用電腦版瀏覽器以獲得最佳體驗。</p>
+    </div>
+    <!-- End Mobile Blocker -->
+
     <div class="container">
         <h1>Pionex 交易海報生成器</h1>
         
@@ -958,6 +987,17 @@
             
             console.log('All initialization complete');
         });
+
+        // Mobile Device Detection
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        if (isMobileDevice()) {
+            document.getElementById('mobile-blocker').style.display = 'flex'; // Show blocker
+            document.querySelector('.container').style.display = 'none'; // Hide main content
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+        }
     </script>
 </body>
 </html> 
