@@ -694,7 +694,6 @@
                         
                         // Add the image to the QR code container
                         qrElement.appendChild(img);
-                        console.log('QR code generated successfully');
                     }
                 });
             } catch (err) {
@@ -704,16 +703,12 @@
         
         // Calculate yield rate based on position type, leverage and prices
         function calculateYieldRate() {
-            console.log('Calculating yield rate...');
-            
             // Get position type
             const positionType = document.querySelector('input[name="position-type"]:checked').value;
-            console.log('Position type:', positionType);
             
             // Get leverage (remove the "X" from the end)
             const leverageStr = document.getElementById('leverage').value;
             const leverage = parseInt(leverageStr.replace('X', ''));
-            console.log('Leverage:', leverage);
             
             // Get prices and remove commas
             const positionPriceStr = document.getElementById('position-price').value.replace(/,/g, '');
@@ -721,9 +716,6 @@
             
             const positionPrice = parseFloat(positionPriceStr);
             const currentPrice = parseFloat(currentPriceStr);
-            
-            console.log('Position price:', positionPrice);
-            console.log('Current price:', currentPrice);
             
             // Check if we have valid numbers
             if (isNaN(positionPrice) || isNaN(currentPrice) || positionPrice <= 0) {
@@ -737,21 +729,15 @@
             if (positionType === '多倉') {
                 // Long position: (current - position) / position * leverage
                 yieldRate = (currentPrice - positionPrice) / positionPrice * leverage;
-                console.log('多倉計算:', `(${currentPrice} - ${positionPrice}) / ${positionPrice} * ${leverage} = ${yieldRate}`);
             } else if (positionType === '空倉') {
                 // Short position: (position - current) / position * leverage
                 yieldRate = (positionPrice - currentPrice) / positionPrice * leverage;
-                console.log('空倉計算:', `(${positionPrice} - ${currentPrice}) / ${positionPrice} * ${leverage} = ${yieldRate}`);
             } else {
-                console.log('未知持倉類型，收益率為0');
                 yieldRate = 0;
             }
             
-            console.log('Calculated yield rate:', yieldRate);
-            
             // Format to percentage with 2 decimal places and + sign for positive values
             const formattedYield = (yieldRate >= 0 ? '+' : '') + (yieldRate * 100).toFixed(2) + '%';
-            console.log('Formatted yield:', formattedYield);
             
             // Update the yield value input
             document.getElementById('yield-value').value = formattedYield;
@@ -771,7 +757,6 @@
                 posterBg.style.backgroundImage = "url('./img/broke.png')";
             }
             
-            console.log('Yield calculation and display update complete');
             return formattedYield;
         }
         
@@ -984,8 +969,6 @@
             
             // Calculate initial yield rate
             setTimeout(calculateYieldRate, 500);
-            
-            console.log('All initialization complete');
         });
 
         // Mobile Device Detection
