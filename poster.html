@@ -824,22 +824,73 @@
             const downloadBtn = document.getElementById('download-btn');
             
             // Calculate yield rate once more before generating image
-            calculateYieldRate();
+            const yieldRateValue = calculateYieldRate(); // Get the numeric yield rate
             
             loading.style.display = 'block';
             downloadBtn.disabled = true;
             
             const poster = document.querySelector('.poster');
-            
-            // Short delay to ensure UI updates are reflected
-            setTimeout(function() {
-                html2canvas(poster, {
+            const posterContent = poster.querySelector('.poster-content');
+            const posterWidth = poster.offsetWidth;
+            const posterHeight = poster.offsetHeight;
+
+            // Determine background image based on yield
+            const isPositiveYield = parseFloat(document.getElementById('yield-value').value.replace('%', '')) >= 0;
+            const bgImageUrl = isPositiveYield ? './img/hat.png' : './img/broke.png';
+
+            // Load the background image
+            const bgImage = new Image();
+            bgImage.crossOrigin = "Anonymous"; // Handle potential CORS issues if image source changes
+            bgImage.onload = () => {
+                // Capture only the content element
+                html2canvas(posterContent, {
                     scale: 2, // Higher quality
-                    useCORS: true, // To load cross-origin images
-                    logging: false
-                }).then(canvas => {
-                    // Create image
-                    const image = canvas.toDataURL('image/png');
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: null, // Transparent background for content capture
+                    width: posterContent.offsetWidth,
+                    height: posterContent.offsetHeight
+                }).then(contentCanvas => {
+                    // Create a new final canvas
+                    const finalCanvas = document.createElement('canvas');
+                    const ctx = finalCanvas.getContext('2d');
+                    const scale = 2; // Match the scale used for content capture
+                    finalCanvas.width = posterWidth * scale;
+                    finalCanvas.height = posterHeight * scale;
+
+                    // 1. Draw the dark background color
+                    ctx.fillStyle = '#111111';
+                    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+                    // 2. Draw the background image (hat or broke)
+                    // Calculate aspect ratios to draw image correctly (cover effect)
+                    const canvasAspect = finalCanvas.width / finalCanvas.height;
+                    const imgAspect = bgImage.naturalWidth / bgImage.naturalHeight;
+                    let drawWidth, drawHeight, offsetX, offsetY;
+
+                    if (canvasAspect > imgAspect) {
+                        drawWidth = finalCanvas.width;
+                        drawHeight = drawWidth / imgAspect;
+                        offsetX = 0;
+                        offsetY = (finalCanvas.height - drawHeight) / 2;
+                    } else {
+                        drawHeight = finalCanvas.height;
+                        drawWidth = drawHeight * imgAspect;
+                        offsetX = (finalCanvas.width - drawWidth) / 2;
+                        offsetY = 0;
+                    }
+                    ctx.globalAlpha = 0.8; // Apply original opacity
+                    ctx.drawImage(bgImage, offsetX, offsetY, drawWidth, drawHeight);
+                    ctx.globalAlpha = 1.0; // Reset alpha
+
+                    // 3. Draw the captured content on top
+                    // contentCanvas already includes the scale, posterContent might not fill poster exactly due to padding
+                    const contentX = posterContent.offsetLeft * scale;
+                    const contentY = posterContent.offsetTop * scale;
+                    ctx.drawImage(contentCanvas, contentX, contentY);
+
+                    // Create image from final canvas
+                    const image = finalCanvas.toDataURL('image/png');
                     
                     // Create temporary link
                     const link = document.createElement('a');
@@ -850,17 +901,24 @@
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    
+
                     // Reset UI state
                     loading.style.display = 'none';
                     downloadBtn.disabled = false;
                 }).catch(error => {
-                    console.error('Error generating poster:', error);
+                    console.error('Error generating content canvas:', error);
                     loading.style.display = 'none';
                     downloadBtn.disabled = false;
-                    alert('海報生成失敗，請再試一次。');
+                    alert('海報內容生成失敗，請再試一次。');
                 });
-            }, 200);
+            };
+            bgImage.onerror = () => {
+                console.error('Error loading background image:', bgImageUrl);
+                loading.style.display = 'none';
+                downloadBtn.disabled = false;
+                alert('背景圖片加載失敗，無法生成海報。');
+            };
+            bgImage.src = bgImageUrl;
         }
         
         // Theme selector
