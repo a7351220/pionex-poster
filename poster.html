@@ -24,6 +24,7 @@
         body {
             background-color: #f4f5f7;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .container {
@@ -51,6 +52,11 @@
         @media (max-width: 768px) {
             .controls {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .poster-container {
+                margin-bottom: 20px;
             }
             
             .poster {
@@ -66,10 +72,110 @@
             .container {
                 padding: 15px;
             }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .poster-content {
+                padding: 20px;
+            }
+            
+            .yield-value {
+                font-size: 50px;
+                line-height: 60px;
+            }
+            
+            .contract-name {
+                font-size: 20px;
+            }
+            
+            .pionex-hat {
+                width: 200px;
+                right: 20px;
+            }
+            
+            .poster-bg {
+                background-position: center;
+            }
         }
         
-        .control-group {
-            margin-bottom: 15px;
+        @media (max-width: 480px) {
+            .poster {
+                aspect-ratio: 3/2;
+            }
+            
+            .poster-content {
+                padding: 15px;
+            }
+            
+            .position-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .detail-item {
+                margin-bottom: 5px;
+            }
+            
+            .yield-value {
+                font-size: 40px;
+                line-height: 48px;
+            }
+            
+            .poster-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .qr-code {
+                align-items: flex-start;
+                width: 100%;
+            }
+            
+            .theme-selector {
+                gap: 8px;
+            }
+            
+            .theme-option {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            input, select {
+                min-height: 44px;
+                font-size: 14px;
+            }
+            
+            .control-group {
+                margin-bottom: 12px;
+            }
+            
+            label {
+                font-size: 14px;
+            }
+            
+            .radio-group {
+                flex-wrap: wrap;
+            }
+            
+            .pionex-hat {
+                width: 150px;
+                right: 10px;
+            }
         }
         
         label {
@@ -118,6 +224,7 @@
             overflow: hidden;
             background-color: var(--dark-bg);
             color: var(--text-color);
+            animation: fadeIn 0.8s ease-in-out;
         }
         
         .poster-content {
@@ -138,9 +245,14 @@
             width: 100%;
             height: 100%;
             z-index: 10;
-            background-image: url('https://pionex.com/static/media/poster_increase_bg_49.e0fafd8c.jpg');
+            background-image: url('./img/hat.png');
             background-size: cover;
+            background-position: center;
             opacity: 0.8;
+        }
+        
+        .poster-bg.negative {
+            background-image: url('./img/broke.png');
         }
         
         .logo img {
@@ -243,7 +355,7 @@
             height: 42px;
             border-radius: 50%;
             background-color: #333;
-            background-image: url('/user-head/pionex_default.png');
+            background-image: url('./img/avatar.png');
             background-size: cover;
             background-position: center;
         }
@@ -269,11 +381,15 @@
             width: 52px;
             height: 52px;
             background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
         
         .scan-text {
-            font-size: 16px;
-            color: var(--primary-color);
+            font-size: 14px;
+            color: #FF6E40;
             cursor: pointer;
         }
         
@@ -301,6 +417,10 @@
         .btn:disabled {
             background-color: #8496c9;
             cursor: not-allowed;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
         }
         
         .loading {
@@ -349,6 +469,15 @@
         .theme-orange {
             background: linear-gradient(45deg, #f46b45, #eea849);
         }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
     <!-- QR Code Generator -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
@@ -360,10 +489,10 @@
         <h1>Pionex 交易海報生成器</h1>
         
         <div class="theme-selector">
-            <div class="theme-option theme-blue active" data-bg="https://pionex.com/static/media/poster_increase_bg_49.e0fafd8c.jpg"></div>
-            <div class="theme-option theme-green" data-bg="https://pionex.com/static/media/poster_increase_bg_30.e0fafd8c.jpg"></div>
-            <div class="theme-option theme-purple" data-bg="https://pionex.com/static/media/poster_increase_bg_15.e0fafd8c.jpg"></div>
-            <div class="theme-option theme-orange" data-bg="https://pionex.com/static/media/poster_increase_bg_10.e0fafd8c.jpg"></div>
+            <div class="theme-option theme-blue active" data-theme="blue"></div>
+            <div class="theme-option theme-green" data-theme="green"></div>
+            <div class="theme-option theme-purple" data-theme="purple"></div>
+            <div class="theme-option theme-orange" data-theme="orange"></div>
         </div>
         
         <div class="controls">
@@ -377,16 +506,12 @@
                     <label>持倉類型</label>
                     <div class="radio-group">
                         <div class="radio-option">
-                            <input type="radio" id="position-empty" name="position-type" value="空倉" checked>
-                            <label for="position-empty">空倉</label>
+                            <input type="radio" id="position-long" name="position-type" value="多倉">
+                            <label for="position-long">多倉</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="position-long" name="position-type" value="做多">
-                            <label for="position-long">做多</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="position-short" name="position-type" value="做空">
-                            <label for="position-short">做空</label>
+                            <input type="radio" id="position-short" name="position-type" value="空倉">
+                            <label for="position-short">空倉</label>
                         </div>
                     </div>
                 </div>
@@ -399,12 +524,14 @@
                         <option value="5X" selected>5X</option>
                         <option value="10X">10X</option>
                         <option value="20X">20X</option>
+                        <option value="50X">50X</option>
+                        <option value="100X">100X</option>
                     </select>
                 </div>
                 
                 <div class="control-group">
                     <label for="yield-value">收益率</label>
-                    <input type="text" id="yield-value" value="+0.18%">
+                    <input type="text" id="yield-value" value="+0.18%" readonly>
                 </div>
                 
                 <div class="control-group">
@@ -420,7 +547,7 @@
                 </div>
                 
                 <div class="control-group">
-                    <label for="current-price">最新價格</label>
+                    <label for="current-price">平倉均價</label>
                     <input type="text" id="current-price" value="82014.4">
                 </div>
                 
@@ -447,11 +574,11 @@
                 <div class="poster-content">
                     <div>
                         <div class="logo">
-                            <img src="https://pionex.com/static/media/icon_nav_logo_new-2.c0ff5e54.png" alt="Pionex Logo">
+                            <img src="./img/logo.png" alt="Pionex Logo">
                         </div>
                         
                         <div class="position-tags">
-                            <div class="tag empty" id="position-tag">空倉</div>
+                            <div class="tag empty" id="position-tag">多倉</div>
                             <div class="tag leverage" id="leverage-tag">5X</div>
                         </div>
                         
@@ -466,7 +593,7 @@
                                 <span class="detail-value" id="display-position-price">82,044.0</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">最新價格</span>
+                                <span class="detail-label">平倉均價</span>
                                 <span class="detail-value" id="display-current-price">82014.4</span>
                             </div>
                             <div class="detail-item">
@@ -487,7 +614,7 @@
                         
                         <div class="qr-code">
                             <div class="qr" id="qrcode"></div>
-                            <span class="scan-text">掃描QR Code, 一鍵跟單</span>
+                            <div class="scan-text">掃描QR Code, 一鍵跟單</div>
                         </div>
                     </div>
                 </div>
@@ -504,16 +631,119 @@
             const qrElement = document.getElementById('qrcode');
             qrElement.innerHTML = ''; // Clear existing QR code
             
-            QRCode.toCanvas(qrElement, `https://download.pionex.com?invite=${text}`, {
-                width: 52,
-                margin: 0,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
+            try {
+                // Make sure QRCode library is loaded
+                if (typeof QRCode === 'undefined') {
+                    console.error('QRCode library is not loaded');
+                    return;
                 }
-            }, function(error) {
-                if (error) console.error(error);
-            });
+                
+                // Get invite code
+                const inviteCode = document.getElementById('invite-code').value;
+                
+                // Set a white background
+                qrElement.style.backgroundColor = 'white';
+                
+                // Create a new QRCode using toDataURL instead of toCanvas
+                QRCode.toDataURL(`https://www.pionex.com/zh-TW/sign/?referral=${inviteCode}`, {
+                    width: 52,
+                    margin: 1,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function(error, url) {
+                    if (error) {
+                        console.error('Error generating QR code:', error);
+                    } else {
+                        // Create an image element with the QR code
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.width = 52;
+                        img.height = 52;
+                        img.style.display = 'block';
+                        
+                        // Add the image to the QR code container
+                        qrElement.appendChild(img);
+                        console.log('QR code generated successfully');
+                    }
+                });
+            } catch (err) {
+                console.error('Failed to generate QR code:', err);
+            }
+        }
+        
+        // Calculate yield rate based on position type, leverage and prices
+        function calculateYieldRate() {
+            console.log('Calculating yield rate...');
+            
+            // Get position type
+            const positionType = document.querySelector('input[name="position-type"]:checked').value;
+            console.log('Position type:', positionType);
+            
+            // Get leverage (remove the "X" from the end)
+            const leverageStr = document.getElementById('leverage').value;
+            const leverage = parseInt(leverageStr.replace('X', ''));
+            console.log('Leverage:', leverage);
+            
+            // Get prices and remove commas
+            const positionPriceStr = document.getElementById('position-price').value.replace(/,/g, '');
+            const currentPriceStr = document.getElementById('current-price').value.replace(/,/g, '');
+            
+            const positionPrice = parseFloat(positionPriceStr);
+            const currentPrice = parseFloat(currentPriceStr);
+            
+            console.log('Position price:', positionPrice);
+            console.log('Current price:', currentPrice);
+            
+            // Check if we have valid numbers
+            if (isNaN(positionPrice) || isNaN(currentPrice) || positionPrice <= 0) {
+                console.error('Invalid price values for calculation');
+                return;
+            }
+            
+            // Calculate yield rate based on position type
+            let yieldRate = 0;
+            
+            if (positionType === '多倉') {
+                // Long position: (current - position) / position * leverage
+                yieldRate = (currentPrice - positionPrice) / positionPrice * leverage;
+                console.log('多倉計算:', `(${currentPrice} - ${positionPrice}) / ${positionPrice} * ${leverage} = ${yieldRate}`);
+            } else if (positionType === '空倉') {
+                // Short position: (position - current) / position * leverage
+                yieldRate = (positionPrice - currentPrice) / positionPrice * leverage;
+                console.log('空倉計算:', `(${positionPrice} - ${currentPrice}) / ${positionPrice} * ${leverage} = ${yieldRate}`);
+            } else {
+                console.log('未知持倉類型，收益率為0');
+                yieldRate = 0;
+            }
+            
+            console.log('Calculated yield rate:', yieldRate);
+            
+            // Format to percentage with 2 decimal places and + sign for positive values
+            const formattedYield = (yieldRate >= 0 ? '+' : '') + (yieldRate * 100).toFixed(2) + '%';
+            console.log('Formatted yield:', formattedYield);
+            
+            // Update the yield value input
+            document.getElementById('yield-value').value = formattedYield;
+            document.getElementById('display-yield').textContent = formattedYield;
+            
+            // Update yield display class
+            const displayYield = document.getElementById('display-yield');
+            const posterBg = document.querySelector('.poster-bg');
+            
+            if (yieldRate >= 0) {
+                displayYield.className = 'yield-value increase';
+                posterBg.classList.remove('negative');
+                posterBg.style.backgroundImage = "url('./img/hat.png')";
+            } else {
+                displayYield.className = 'yield-value decrease';
+                posterBg.classList.add('negative');
+                posterBg.style.backgroundImage = "url('./img/broke.png')";
+            }
+            
+            console.log('Yield calculation and display update complete');
+            return formattedYield;
         }
         
         // Update poster with form input values
@@ -527,15 +757,16 @@
             const positionTag = document.getElementById('position-tag');
             positionTag.textContent = positionType;
             
-            if (positionType === '做多') {
+            if (positionType === '多倉') {
                 positionTag.className = 'tag empty';
                 positionTag.style.color = '#25C26E';
                 positionTag.style.backgroundColor = 'rgba(37, 194, 110, 0.1)';
-            } else if (positionType === '做空') {
+            } else if (positionType === '空倉') {
                 positionTag.className = 'tag empty';
                 positionTag.style.color = '#E7413C';
                 positionTag.style.backgroundColor = 'rgba(231, 65, 60, 0.1)';
             } else {
+                // 如果有其他未知類型，使用默認樣式
                 positionTag.className = 'tag empty';
                 positionTag.style.color = '#E7413C';
                 positionTag.style.backgroundColor = 'rgba(231, 65, 60, 0.1)';
@@ -545,18 +776,8 @@
             const leverage = document.getElementById('leverage').value;
             document.getElementById('leverage-tag').textContent = leverage;
             
-            // Update yield
-            const yieldValue = document.getElementById('yield-value').value;
-            const displayYield = document.getElementById('display-yield');
-            displayYield.textContent = yieldValue;
-            
-            if (yieldValue.includes('+')) {
-                displayYield.className = 'yield-value increase';
-            } else if (yieldValue.includes('-')) {
-                displayYield.className = 'yield-value decrease';
-            } else {
-                displayYield.className = 'yield-value';
-            }
+            // Always calculate and update yield rate whenever any input changes
+            calculateYieldRate();
             
             // Update position price
             document.getElementById('display-position-price').textContent = 
@@ -578,7 +799,7 @@
             const inviteCode = document.getElementById('invite-code').value;
             document.getElementById('display-invite-code').textContent = inviteCode;
             
-            // Update QR code
+            // Update QR code with the invite code
             generateQRCode(inviteCode);
         }
         
@@ -602,38 +823,44 @@
             const loading = document.getElementById('loading');
             const downloadBtn = document.getElementById('download-btn');
             
+            // Calculate yield rate once more before generating image
+            calculateYieldRate();
+            
             loading.style.display = 'block';
             downloadBtn.disabled = true;
             
             const poster = document.querySelector('.poster');
             
-            html2canvas(poster, {
-                scale: 2, // Higher quality
-                useCORS: true, // To load cross-origin images
-                logging: false
-            }).then(canvas => {
-                // Create image
-                const image = canvas.toDataURL('image/png');
-                
-                // Create temporary link
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = 'pionex-poster.png';
-                
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // Reset UI state
-                loading.style.display = 'none';
-                downloadBtn.disabled = false;
-            }).catch(error => {
-                console.error('Error generating poster:', error);
-                loading.style.display = 'none';
-                downloadBtn.disabled = false;
-                alert('海報生成失敗，請再試一次。');
-            });
+            // Short delay to ensure UI updates are reflected
+            setTimeout(function() {
+                html2canvas(poster, {
+                    scale: 2, // Higher quality
+                    useCORS: true, // To load cross-origin images
+                    logging: false
+                }).then(canvas => {
+                    // Create image
+                    const image = canvas.toDataURL('image/png');
+                    
+                    // Create temporary link
+                    const link = document.createElement('a');
+                    link.href = image;
+                    link.download = 'pionex-poster.png';
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Reset UI state
+                    loading.style.display = 'none';
+                    downloadBtn.disabled = false;
+                }).catch(error => {
+                    console.error('Error generating poster:', error);
+                    loading.style.display = 'none';
+                    downloadBtn.disabled = false;
+                    alert('海報生成失敗，請再試一次。');
+                });
+            }, 200);
         }
         
         // Theme selector
@@ -642,10 +869,6 @@
                 // Update active state
                 document.querySelector('.theme-option.active').classList.remove('active');
                 this.classList.add('active');
-                
-                // Update background image
-                const bgImage = this.getAttribute('data-bg');
-                document.querySelector('.poster-bg').style.backgroundImage = `url(${bgImage})`;
             });
         });
         
@@ -660,8 +883,22 @@
         
         // Initialize poster
         window.addEventListener('load', function() {
-            // Generate initial QR code
-            generateQRCode(document.getElementById('invite-code').value);
+            // Select default position type if none selected
+            if (!document.querySelector('input[name="position-type"]:checked')) {
+                document.getElementById('position-long').checked = true;
+            }
+            
+            // Generate initial QR code with the invite code value
+            const initialInviteCode = document.getElementById('invite-code').value;
+            generateQRCode(initialInviteCode);
+            
+            // Update the poster display with initial values
+            updatePoster();
+            
+            // Calculate initial yield rate
+            setTimeout(calculateYieldRate, 500);
+            
+            console.log('All initialization complete');
         });
     </script>
 </body>
